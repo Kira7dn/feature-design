@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ARG PORT=8051
+ARG PORT=80
 
 WORKDIR /app
 
@@ -17,5 +17,5 @@ RUN uv pip install --system -e . && \
 
 EXPOSE ${PORT}
 
-# Command to run the MCP server
-CMD ["uv", "run", "src/crawl4ai_mcp.py"]
+# Command to run the FastAPI server
+CMD ["uv", "run", "src/main.py"]
