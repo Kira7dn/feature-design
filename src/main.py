@@ -24,6 +24,8 @@ async def lifespan(app):
     fastapi_crawler = AsyncWebCrawler(config=browser_config)
     await fastapi_crawler.__aenter__()
     logging.info("FastAPI crawler initialized.")
+    # Attach to app.state so it's available in requests
+    app.state.fastapi_crawler = fastapi_crawler
     try:
         yield
     finally:
