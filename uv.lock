@@ -291,6 +291,18 @@ wheels = [
 ]
 
 [[package]]
+name = "colorgram-py"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/41/52/8a6d33deace24a123881a4779467fbf18f8858368c09ff0eb9d6846b8bdd/colorgram.py-1.2.0.tar.gz", hash = "sha256:e77766a5f9de7207bdef8f1c22a702cbf09630eae3bc46a450b9d9f12a7bfdbf", size = 5937, upload-time = "2018-12-27T19:54:51.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/be/4e6d6e89c3239108709bd4bcbe95777c715510023c8d394bdffebf4596fc/colorgram.py-1.2.0-py2.py3-none-any.whl", hash = "sha256:e990769fa6df7261a450c7d5bef3a1a062f09ba1214bff67b4d6f02970a1a27b", size = 6163, upload-time = "2018-12-27T19:54:48.989Z" },
+]
+
+[[package]]
 name = "crawl4ai"
 version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -379,8 +391,11 @@ name = "design"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "aiohttp" },
+    { name = "colorgram-py" },
     { name = "crawl4ai" },
     { name = "fastapi" },
+    { name = "numpy" },
     { name = "opencv-python" },
     { name = "scikit-learn" },
     { name = "uvicorn" },
@@ -388,8 +403,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.12.2" },
+    { name = "colorgram-py", specifier = ">=1.2.0" },
     { name = "crawl4ai", specifier = ">=0.6.3" },
     { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "numpy", specifier = ">=2.2.6" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "uvicorn", specifier = ">=0.34.2" },

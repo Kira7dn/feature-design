@@ -18,4 +18,4 @@ RUN uv pip install --system -e . && \
 EXPOSE ${PORT}
 
 # Command to run the FastAPI server
-CMD ["uv", "run", "src/main.py"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
