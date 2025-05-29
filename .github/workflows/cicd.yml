@@ -38,14 +38,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo sysctl vm.overcommit_memory=1
+            # Use a user-specific directory for deployment
+            DEPLOY_DIR=/home/${{ secrets.EC2_USER }}/design
+
             # If the repo does not exist, clone it; otherwise, pull latest
-            if [ ! -d /opt/design/.git ]; then
-              git clone https://github.com/${GITHUB_REPOSITORY}.git /opt/design
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              git clone https://github.com/${GITHUB_REPOSITORY}.git "$DEPLOY_DIR"
             else
-              cd /opt/design
+              cd "$DEPLOY_DIR"
               git pull origin main
             fi
-            cd /opt/design
+            cd "$DEPLOY_DIR"
             docker compose down
             docker compose build
             docker image prune -f
