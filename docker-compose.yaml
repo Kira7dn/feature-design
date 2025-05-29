@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "5000:80"
+    depends_on:
+      - redis
+    command: uvicorn src.main:app --host 0.0.0.0 --port 80
+    environment:
+      - REDIS_HOST=redis
+
+  worker:
+    build: .
+    restart: always
+    depends_on:
+      - redis
+    command: rq worker default --url redis://redis:6379/0
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"

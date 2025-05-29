@@ -1,7 +1,8 @@
-from crawl4ai import CrawlerRunConfig, CacheMode
+from crawl4ai import CrawlerRunConfig, CacheMode, AsyncWebCrawler, BrowserConfig
 from fastapi import Request
 from src.utils import extract_dribbble_query, extract_design_features
 import re
+import asyncio
 
 
 async def run_crawl(url: str, request: Request):
@@ -10,6 +11,19 @@ async def run_crawl(url: str, request: Request):
     run_config = CrawlerRunConfig(cache_mode=CacheMode.BYPASS, stream=False)
     result = await fastapi_crawler.arun(url=url, config=run_config)
     if result.success and result.markdown:
+        if isinstance(result.markdown, str):
+            from crawl4ai.models import MarkdownGenerationResult
+
+            # Directly modifying the protected attribute '_markdown' as no public setter is available.
+            # This is necessary to ensure the result object contains the required MarkdownGenerationResult structure.
+            result._markdown = MarkdownGenerationResult(
+                raw_markdown=result.markdown,
+                markdown_with_citations="",
+                references_markdown="",
+                fit_markdown="",
+                fit_html="",
+            )
+
         response = {
             "success": True,
             "url": url,
@@ -26,6 +40,51 @@ async def run_crawl(url: str, request: Request):
         # If the URL matches a Dribbble single shot, use extract_design_features
         elif re.match(r"https://dribbble.com/shots/", url):
             response["result"] = extract_design_features(result.markdown)
+
         return response
     else:
         return {"success": False, "url": url, "error": result.error_message}
+
+
+def run_crawl_sync(url: str):
+    # This function is for RQ worker (sync context)
+    browser_config = BrowserConfig(headless=True, verbose=False)
+    fastapi_crawler = AsyncWebCrawler(config=browser_config)
+    run_config = CrawlerRunConfig(cache_mode=CacheMode.BYPASS, stream=False)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(fastapi_crawler.arun(url=url, config=run_config))
+    loop.close()
+
+    if result.success and result.markdown:
+        if isinstance(result.markdown, str):
+            from crawl4ai.models import MarkdownGenerationResult
+
+            result._markdown = MarkdownGenerationResult(
+                raw_markdown=result.markdown,
+                markdown_with_citations="",
+                references_markdown="",
+                fit_markdown="",
+                fit_html="",
+            )
+
+        response = {
+            "success": True,
+            "url": url,
+            "content_length": len(result.markdown),
+            "markdown": result.markdown,
+            "links_count": {
+                "internal": len(result.links.get("internal", [])),
+                "external": len(result.links.get("external", [])),
+            },
+        }
+
+        if re.match(r"https://dribbble.com/search/shots/", url):
+            response["result"] = extract_dribbble_query(result.markdown)
+        elif re.match(r"https://dribbble.com/shots/", url):
+            response["result"] = extract_design_features(result.markdown)
+
+        return response
+
+    return {"success": False, "url": url, "error": result.error_message}

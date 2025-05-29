@@ -8,5 +8,9 @@ dependencies = [
     "crawl4ai>=0.6.3",
     "fastapi>=0.115.12",
     "uvicorn>=0.34.2",
-    "colorgram.py>=1.2.0",  # added for color extraction
+    "colorgram.py>=1.2.0", # added for color extraction
+    "threadpoolexecutorplus>=0.2.2",
+    "msgpack>=1.1.0",
+    "rq>=1.15.1",
+    "redis>=5.0.1",
 ]

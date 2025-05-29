@@ -4,8 +4,11 @@ ARG PORT=80
 
 WORKDIR /app
 
-# Install uv
-RUN pip install uv
+# Install uv and Redis CLI tools for debugging/monitoring
+RUN apt-get update && \
+    apt-get install -y redis-tools python3-setuptools && \
+    pip install uv && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the MCP server files
 COPY . .
