@@ -32,18 +32,24 @@ jobs:
     steps:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            export GITHUB_REPOSITORY=${{ github.repository }}
             sudo sysctl vm.overcommit_memory=1
             # Use a user-specific directory for deployment
             DEPLOY_DIR=/home/${{ secrets.EC2_USER }}/design
 
+            # Use GITHUB_REPOSITORY for the repository URL
+            REPO_URL="https://github.com/${GITHUB_REPOSITORY}.git"
+
             # If the repo does not exist, clone it; otherwise, pull latest
             if [ ! -d "$DEPLOY_DIR/.git" ]; then
-              git clone https://github.com/${GITHUB_REPOSITORY}.git "$DEPLOY_DIR"
+              git clone "$REPO_URL" "$DEPLOY_DIR"
             else
               cd "$DEPLOY_DIR"
               git pull origin main
