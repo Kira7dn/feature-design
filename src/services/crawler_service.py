@@ -5,6 +5,18 @@ import re
 import asyncio
 
 
+def create_markdown_generation_result(raw_markdown: str):
+    from crawl4ai.models import MarkdownGenerationResult
+
+    return MarkdownGenerationResult(
+        raw_markdown=raw_markdown,
+        markdown_with_citations="",
+        references_markdown="",
+        fit_markdown="",
+        fit_html="",
+    )
+
+
 async def run_crawl(url: str, request: Request):
     # Get the crawler instance from app state
     fastapi_crawler = request.app.state.fastapi_crawler
@@ -14,14 +26,9 @@ async def run_crawl(url: str, request: Request):
         if isinstance(result.markdown, str):
             from crawl4ai.models import MarkdownGenerationResult
 
-            # Directly modifying the protected attribute '_markdown' as no public setter is available.
-            # This is necessary to ensure the result object contains the required MarkdownGenerationResult structure.
-            result._markdown = MarkdownGenerationResult(
-                raw_markdown=result.markdown,
-                markdown_with_citations="",
-                references_markdown="",
-                fit_markdown="",
-                fit_html="",
+            # Use a helper function to construct the MarkdownGenerationResult object.
+            result.markdown_generation_result = create_markdown_generation_result(
+                result.markdown
             )
 
         response = {
@@ -38,7 +45,7 @@ async def run_crawl(url: str, request: Request):
         if re.match(r"https://dribbble.com/search/shots/", url):
             response["result"] = extract_dribbble_query(result.markdown)
         # If the URL matches a Dribbble single shot, use extract_design_features
-        elif re.match(r"https://dribbble.com/shots/", url):
+        if re.match(r"https://dribbble.com/shots/", url):
             response["result"] = extract_design_features(result.markdown)
 
         return response

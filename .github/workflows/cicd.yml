@@ -39,13 +39,13 @@ jobs:
           script: |
             sudo sysctl vm.overcommit_memory=1
             # If the repo does not exist, clone it; otherwise, pull latest
-            if [ ! -d /opt/low-feature-extraction/.git ]; then
-              git clone https://github.com/${GITHUB_REPOSITORY}.git /opt/low-feature-extraction
+            if [ ! -d /opt/design/.git ]; then
+              git clone https://github.com/${GITHUB_REPOSITORY}.git /opt/design
             else
-              cd /opt/low-feature-extraction
-              git pull origin master
+              cd /opt/design
+              git pull origin main
             fi
-            cd /opt/low-feature-extraction
+            cd /opt/design
             docker compose down
             docker compose build
             docker image prune -f
